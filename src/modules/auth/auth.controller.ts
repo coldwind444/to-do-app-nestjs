@@ -16,11 +16,22 @@ export class AuthController {
     ){}
 
     @Post('login')
-    async logIn(@Body() body : LoginDto) : Promise<ApiResponse<TokenDto>>{
+    async login(@Body() body : LoginDto) : Promise<ApiResponse<TokenDto>>{
         const res = await this.authService.logIn(body)
         return {
             status: 200,
             message: 'Login success.',
+            data: res
+        }
+    }
+
+    @Post('logout')
+    @UseGuards(AuthGuard)
+    async logout(@Request() req) : Promise<ApiResponse<boolean>>{
+        const res = await this.authService.logout(req.user.userid, req.user.jti)
+        return {
+            status: 200,
+            message: 'Logout success.',
             data: res
         }
     }
