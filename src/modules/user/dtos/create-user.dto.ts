@@ -4,4 +4,5 @@ export class CreateUserDto {
     fname: string
     lname: string
     gender: boolean
+    email: string
 }

@@ -39,16 +39,20 @@ export class ItemService {
     }
 
     async update(userid: number, req: UpdateItemDto): Promise<Item> {
-        const item = await this.itemRepository.preload({
-            owner: { id: userid },
-            ...req
-        });
+        const item = await this.itemRepository.findOne({
+            where: {
+                id: req.id,
+                owner: { id: userid }
+            }
+        })
 
         if (!item) {
             throw new HttpException(`Item with ID ${req.id} not found`, HttpStatus.NOT_FOUND);
         }
 
-        return this.itemRepository.save(item);
+        const updatedItem = this.itemRepository.merge(item, req)
+
+        return this.itemRepository.save(updatedItem);
     }
 
     findByStatus(userid: number, finished: boolean) : Promise<Item[]> {
