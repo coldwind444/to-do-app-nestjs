@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Query, ParseBoolPipe, Request } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards, Query, ParseBoolPipe, Request, Get, Response } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { TokenDto } from "./dtos/token.dto";
 import { ApiResponse } from "src/common/api-response.dto";
@@ -8,6 +8,7 @@ import { OtpRequestDto } from "./dtos/otp-request.dto";
 import { OtpResponseDto } from "./dtos/otp-response.dto";
 import { ConfirmOtpDto } from "./dtos/confirm-otp.dto";
 import { ResetPasswordDto } from "./dtos/reset-password.dto";
+import { GoogleAuthGuard } from "./google-auth.guard";
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +24,18 @@ export class AuthController {
             message: 'Login success.',
             data: res
         }
+    }
+
+    @Get('google/login')
+    @UseGuards(GoogleAuthGuard)
+    async googleLogin(){}
+
+    @Get('google/callback')
+    @UseGuards(GoogleAuthGuard)
+    async googleRedirect(@Request() req, @Response() res){
+        const user = req.user
+        const resp = await this.authService.googleOAuth2(user.email, user.firstName, user.lastName)
+        res.redirect(`http://localhost:5173/auth/google/oauth2-success?jwt=${resp.jwt}`)
     }
 
     @Post('logout')

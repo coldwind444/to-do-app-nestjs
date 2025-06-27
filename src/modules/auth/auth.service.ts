@@ -53,6 +53,44 @@ export class AuthService {
 
     }
 
+    async googleOAuth2(email: string, fname: string, lname: string): Promise<TokenDto> {
+        try {
+            var user = await this.userService.findByUsername(email)
+        } catch {
+            user = await this.userService.create({
+                username: email,
+                email: email,
+                fname: fname,
+                lname: lname,
+                gender: true,
+                password: ''
+            })
+        }
+
+        const payload =
+        {
+            sub: user.username,
+            userid: user.id,
+            jti: uuidv4(),
+            issuer: 'todoapp',
+            issueAt: new Date(),
+            expires: Date.now()
+        }
+
+        var token = ""
+        try {
+            token = await this.jwtService.signAsync(payload)
+        } catch (err) {
+            throw new HttpException('Fail to generate token.', HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+
+        return {
+            jwt: token,
+            success: true
+        }
+
+    }
+
     async logout(userid: number, jti: string): Promise<boolean> {
         try {
             await this.tokenService.create(userid, jti)

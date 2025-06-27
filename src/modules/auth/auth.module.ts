@@ -8,10 +8,12 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TokenModule } from "../token/token.module";
 import { OtpModule } from "../otp/otp.module";
 import { MailModule } from "../mail/mail.module";
+import { GoogleAuthGuard } from "./google-auth.guard";
+import { GoogleStrategy } from "./google.strategy";
 
 @Module({
     controllers: [AuthController],
-    providers: [AuthService, AuthGuard],
+    providers: [AuthService, AuthGuard, GoogleStrategy],
     exports: [AuthService, AuthGuard],
     imports: [
         forwardRef(() => UserModule),

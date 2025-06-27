@@ -14,7 +14,8 @@ export class UserService {
         private userRepository: Repository<User>,
     ) { }
 
-    encode(input: string): Promise<string> {
+    encode(input: string): Promise<string> | string {
+        if (input.length === 0) return ''
         const saltOrRounds = 10
         return bcrypt.hash(input, saltOrRounds)
     }
